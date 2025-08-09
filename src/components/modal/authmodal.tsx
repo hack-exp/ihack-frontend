@@ -3,12 +3,12 @@
 import React from "react";
 import { SignIn, SignUp } from "@clerk/nextjs";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"; 
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -24,22 +24,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onModeChange,
 }) => {
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-full sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>
+    // Use Dialog instead of Sheet
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>
             {mode === "signin" ? "Sign In" : "Create Account"}
-          </SheetTitle>
-          <SheetDescription>
+          </DialogTitle>
+          <DialogDescription>
             {mode === "signin"
               ? "Welcome back! Sign in to continue your conversations."
               : "Join Stellar AI to start your personalized AI experience."}
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
 
         <div className="mt-6">
           {mode === "signin" ? (
             <SignIn
+              routing="hash" // Add hash-based routing
               appearance={{
                 elements: {
                   formButtonPrimary:
@@ -54,12 +56,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   footer: "hidden",
                 },
               }}
-              redirectUrl="/dashboard"
-              signUpUrl="#"
-              signUpForceRedirectUrl="/dashboard"
             />
           ) : (
             <SignUp
+              routing="hash" // Add hash-based routing
               appearance={{
                 elements: {
                   formButtonPrimary:
@@ -74,9 +74,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   footer: "hidden",
                 },
               }}
-              redirectUrl="/dashboard"
-              signInUrl="#"
-              signInForceRedirectUrl="/dashboard"
             />
           )}
 
@@ -96,7 +93,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </p>
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 };
