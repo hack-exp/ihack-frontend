@@ -8,13 +8,33 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog"; 
+} from "@/components/ui/dialog";
+import { useAuth } from "@clerk/clerk-react";
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   mode: "signin" | "signup";
   onModeChange: (mode: "signin" | "signup") => void;
+}
+
+const { getToken } = useAuth();
+
+async function callBackend() {
+  const token = await getToken();
+  await fetch(
+    `${process.env.BACK_END_URL}/45714289-adc03465-590e-4494-abe0-b65f497b3113?action=share&creator=45714289`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        /* your data */
+      }),
+    }
+  );
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
