@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Message, WorkflowStep } from "@/types/chat";
-
 interface EnhancedMessageBubbleProps {
   message: Message;
   isTyping?: boolean;
@@ -342,8 +341,8 @@ const WorkflowDropdown: React.FC<{ message: Message }> = ({ message }) => {
           hasErrors
             ? "bg-red-50 border-red-200 hover:bg-red-100/50"
             : runningSteps > 0
-            ? "bg-blue-50 border-blue-200 hover:bg-blue-100/50"
-            : "bg-green-50 border-green-200 hover:bg-green-100/50",
+              ? "bg-blue-50 border-blue-200 hover:bg-blue-100/50"
+              : "bg-green-50 border-green-200 hover:bg-green-100/50",
           "border rounded-lg"
         )}
       >
@@ -406,15 +405,15 @@ export function EnhancedMessageBubble({
       <Avatar
         className={cn(
           "h-9 w-9 shrink-0 transition-all duration-200 group-hover:scale-110",
-          isUser ? "ring-2 ring-primary/20" : "ring-2 ring-blue-500/20"
+          isUser ? "ring-2 ring-primary/20" : "ring-2 ring-violet-500/20"
         )}
       >
         <AvatarFallback
           className={cn(
             "text-sm font-semibold transition-colors duration-200",
             isUser
-              ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground"
-              : "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg"
+              ? "bg-primary text-primary-foreground"
+              : "bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-lg"
           )}
         >
           {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
@@ -431,14 +430,14 @@ export function EnhancedMessageBubble({
           <span
             className={cn(
               "text-sm font-semibold",
-              isUser ? "text-primary" : "text-blue-600"
+              isUser ? "text-primary" : "text-violet-500"
             )}
           >
             {isUser ? "You" : "Stellar AI"}
           </span>
           <Badge
             variant="outline"
-            className="text-xs px-2 py-0.5 bg-white/50 backdrop-blur-sm"
+            className="text-xs px-2 py-0.5 bg-background/50 backdrop-blur-sm"
           >
             {new Date(message.timestamp).toLocaleTimeString([], {
               hour: "2-digit",
@@ -449,10 +448,10 @@ export function EnhancedMessageBubble({
 
         <Card
           className={cn(
-            "max-w-full border shadow-lg transition-all duration-200 hover:shadow-xl",
+            "max-w-full transition-all duration-300",
             isUser
-              ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground border-primary/30 shadow-primary/20"
-              : "bg-gradient-to-br from-white to-slate-50 border-slate-200/60 shadow-slate-200/50"
+              ? "glass-card-primary text-primary-foreground" // Glass style for user
+              : "glass-card text-card-foreground" // Glass style for AI
           )}
         >
           <CardContent className="p-5">
@@ -466,18 +465,18 @@ export function EnhancedMessageBubble({
             <div
               className={cn(
                 "text-sm leading-relaxed whitespace-pre-wrap",
-                isUser ? "text-primary-foreground" : "text-foreground"
+                // isUser ? "text-primary-foreground" : "text-foreground"
               )}
             >
               {message.content ||
                 (isTyping ? (
                   <div className="flex items-center gap-3 py-2">
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
                     </div>
-                    <span className="text-blue-600 font-medium">
+                    <span className="text-primary font-medium">
                       Thinking...
                     </span>
                   </div>

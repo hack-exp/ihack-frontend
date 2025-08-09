@@ -107,6 +107,32 @@ export function WelcomeMessage() {
           </Badge>
         </div>
       </div>
+
+      {/* The following section can be added to display the capabilities */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+        {capabilities.map((capability, index) => (
+          <Card key={index} className="glass-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                  {capability.icon}
+                </div>
+                <span>{capability.title}</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">{capability.description}</p>
+              <div className="space-y-2">
+                {capability.examples.map((example, i) => (
+                  <Badge key={i} variant="outline" className="cursor-pointer hover:bg-accent">
+                    {example}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }

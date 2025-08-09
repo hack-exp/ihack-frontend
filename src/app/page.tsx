@@ -33,7 +33,7 @@ export default function ChatPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn, } = useUser();
   const [authModal, setAuthModal] = useState({
     isOpen: false,
     mode: "signin" as "signin" | "signup",
@@ -216,14 +216,14 @@ export default function ChatPage() {
                       stepData.step_type === "input"
                         ? "system"
                         : stepData.step_type === "analysis"
-                        ? "llm"
-                        : stepData.step_type === "response"
-                        ? "llm"
-                        : stepData.step_type === "stream"
-                        ? "system"
-                        : stepData.step_type === "ui"
-                        ? "system"
-                        : "system",
+                          ? "llm"
+                          : stepData.step_type === "response"
+                            ? "llm"
+                            : stepData.step_type === "stream"
+                              ? "system"
+                              : stepData.step_type === "ui"
+                                ? "system"
+                                : "system",
                     status:
                       stepData.status === "completed" ? "completed" : "running",
                     description: stepData.description,
@@ -569,7 +569,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-950">
+    <div className="flex h-screen bg-background">
       <AuthModal
         isOpen={authModal.isOpen}
         onClose={() => setAuthModal({ ...authModal, isOpen: false })}
@@ -577,7 +577,7 @@ export default function ChatPage() {
         onModeChange={(mode) => setAuthModal({ ...authModal, mode })}
       />
       <div className="flex-1 flex flex-col">
-        <div className="border-b bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 p-4 shadow-lg border-slate-200/60">
+        <div className="border-b bg-background/80 backdrop-blur-sm dark:bg-background/60 p-4 shadow-sm">
           <div className="flex items-center justify-between max-w-4xl mx-auto">
             <div className="flex items-center gap-4">
               <Button
@@ -589,13 +589,13 @@ export default function ChatPage() {
                   !currentChat.messages ||
                   currentChat.messages.length === 0
                 }
-                className="flex items-center gap-2 hover:bg-red-50 hover:text-red-600 hover:border-red-300 dark:hover:bg-red-950/30 transition-all duration-200 shadow-sm"
+                className="flex items-center gap-2 hover:bg-red-50 hover:text-red-600 hover:border-red-300 dark:hover:bg-red-950/30 transition-all duration-200"
               >
                 <Trash2 className="h-4 w-4" />
                 Clear Chat
               </Button>
 
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-md">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-md">
                 <Bot className="h-5 w-5 text-white" />
               </div>
 
@@ -610,14 +610,14 @@ export default function ChatPage() {
                     {currentChat.messages?.some(
                       (m) => m.workflowData?.steps?.length
                     ) && (
-                      <>
-                        <span>•</span>
-                        <div className="flex items-center gap-1">
-                          <Activity className="h-3 w-3 text-blue-600" />
-                          <span className="text-blue-600">Workflow Active</span>
-                        </div>
-                      </>
-                    )}
+                        <>
+                          <span>•</span>
+                          <div className="flex items-center gap-1">
+                            <Activity className="h-3 w-3 text-primary" />
+                            <span className="text-primary">Workflow Active</span>
+                          </div>
+                        </>
+                      )}
                   </div>
                 )}
               </div>
@@ -625,11 +625,11 @@ export default function ChatPage() {
 
             <div className="flex items-center gap-3">
               {isTyping && (
-                <div className="flex items-center gap-3 text-sm text-blue-600 bg-blue-50 dark:bg-blue-950/30 px-4 py-2 rounded-full border border-blue-200 shadow-sm">
+                <div className="flex items-center gap-3 text-sm text-primary bg-primary/10 px-4 py-2 rounded-full border border-primary/20">
                   <div className="flex gap-1">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
+                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></div>
                   </div>
                   <span className="font-medium">AI Thinking...</span>
                 </div>
@@ -639,7 +639,7 @@ export default function ChatPage() {
             </div>
           </div>
         </div>
-        <ScrollArea className="flex-1 p-6 bg-gradient-to-b from-transparent to-slate-50/30">
+        <ScrollArea className="flex-1 p-6 page-background">
           <div className="space-y-6 max-w-4xl mx-auto">
             {!currentChat?.messages || currentChat.messages.length === 0 ? (
               <WelcomeMessage />
@@ -658,7 +658,7 @@ export default function ChatPage() {
             <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
-        <div className="border-t p-6 bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 border-slate-200/60 shadow-lg">
+        <div className="border-t p-6 bg-background/80 backdrop-blur-sm dark:bg-background/60">
           <div className="max-w-4xl mx-auto">
             <EnhancedInput
               value={input}
@@ -670,7 +670,7 @@ export default function ChatPage() {
               placeholder="Type your message to Stellar AI..."
             />
             {error && (
-              <div className="mt-3 flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
+              <div className="mt-3 flex items-center gap-2 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-500/30">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <span>{error}</span>
               </div>
