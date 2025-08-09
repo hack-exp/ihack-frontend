@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useUser } from "@clerk/nextjs";
 import { Chat, Message, WorkflowData, WorkflowStep } from "@/types/chat";
 import { saveCurrentChat, loadCurrentChat } from "../utils/storage";
 import { getStreamingResponse, checkBackendHealth } from "../services/api";
@@ -9,6 +10,7 @@ import { EnhancedMessageBubble } from "../components/EnhancedMessageBubble";
 import { WelcomeMessage } from "../components/WelcomeMessage";
 import ThemeToggle from "../components/ThemeToggle";
 import { EnhancedInput } from "../components/EnhancedInput";
+import { AuthModal } from "../components/modal/authmodal";
 
 // shadcn/ui components
 import { Button } from "../components/ui/button";
@@ -30,39 +32,52 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Ref for auto-scrolling to bottom of messages
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { isSignedIn, user } = useUser();
+  const [authModal, setAuthModal] = useState({
+    isOpen: false,
+    mode: "signin" as "signin" | "signup",
+  });
 
-  // Add backend health state
   const [backendHealth, setBackendHealth] = useState<
     "healthy" | "unhealthy" | "checking"
-  >("checking"); // Load chat from localStorage on component mount
-  useEffect(() => {
-    const savedChat = loadCurrentChat();
+  >("checking");
 
-    if (savedChat) {
-      setCurrentChat(savedChat);
-    } else {
-      // Create a welcome chat if none found
-      const initialChat: Chat = {
-        id: "1",
-        title: "Welcome Chat",
-        messages: [
-          {
-            role: "assistant",
-            content: "Hello! I'm Stellar AI. How can I help you today?",
-            timestamp: new Date().toISOString(),
-          },
-        ],
-        lastMessage: undefined,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      setCurrentChat(initialChat);
-      saveCurrentChat(initialChat);
+  useEffect(() => {
+    if (!isInitialized) {
+      const savedChat = loadCurrentChat();
+      if (savedChat) {
+        setCurrentChat(savedChat);
+      } else {
+        const initialChat: Chat = {
+          id: "1",
+          title: "Welcome Chat",
+          messages: [
+            {
+              role: "assistant",
+              content: "Hello! I'm Stellar AI. How can I help you today?",
+              timestamp: new Date().toISOString(),
+            },
+          ],
+          lastMessage: undefined,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        setCurrentChat(initialChat);
+        saveCurrentChat(initialChat);
+      }
+      setIsInitialized(true);
     }
-    setIsInitialized(true);
-  }, []); // Save chat to localStorage whenever it changes (with debouncing)
+  }, [isInitialized]);
+
+  useEffect(() => {
+    if (isInitialized && !isSignedIn) {
+      setAuthModal({ isOpen: true, mode: "signin" });
+    } else {
+      setAuthModal({ isOpen: false, mode: "signin" });
+    }
+  }, [isInitialized, isSignedIn]);
+
   useEffect(() => {
     if (!currentChat) return;
 
@@ -74,7 +89,6 @@ export default function ChatPage() {
       return;
     }
 
-    // Add a small delay to debounce rapid updates
     const timeoutId = setTimeout(() => {
       try {
         saveCurrentChat(currentChat);
@@ -86,7 +100,6 @@ export default function ChatPage() {
     return () => clearTimeout(timeoutId);
   }, [currentChat]);
 
-  // Auto-scroll to bottom when messages change
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -95,7 +108,6 @@ export default function ChatPage() {
     scrollToBottom();
   }, [currentChat, isTyping]);
 
-  // Check backend health on mount
   useEffect(() => {
     const checkHealth = async () => {
       try {
@@ -108,35 +120,22 @@ export default function ChatPage() {
     };
 
     checkHealth();
-    const interval = setInterval(checkHealth, 30000); // Check every 30 seconds
+    const interval = setInterval(checkHealth, 30000);
     return () => clearInterval(interval);
-  }, []); // Clear current chat messages
+  }, []);
+
   const clearChat = useCallback(() => {
     if (!currentChat) return;
-
     const clearedChat: Chat = {
       ...currentChat,
       messages: [],
       lastMessage: undefined,
       updatedAt: new Date().toISOString(),
     };
-
     setCurrentChat(clearedChat);
-
-    // Clear any errors
     setError(null);
   }, [currentChat]);
-  // Check backend health on mount
-  useEffect(() => {
-    const checkHealth = async () => {
-      const health = await checkBackendHealth();
-      setBackendHealth(health.status);
-    };
 
-    checkHealth();
-    const interval = setInterval(checkHealth, 30000); // Check every 30s
-    return () => clearInterval(interval);
-  }, []);
   const sendMessage = useCallback(
     async (content: string) => {
       if (!currentChat || !content.trim() || isLoading) return;
@@ -146,14 +145,12 @@ export default function ChatPage() {
         setIsTyping(true);
         setError(null);
 
-        // Create user message with proper type
         const userMessage: Message = {
           role: "user",
           content: content.trim(),
           timestamp: new Date().toISOString(),
         };
 
-        // Update chat with user message
         const chatWithUserMessage: Chat = {
           ...currentChat,
           messages: [...currentChat.messages, userMessage],
@@ -164,19 +161,16 @@ export default function ChatPage() {
         setCurrentChat(chatWithUserMessage);
         setInput("");
 
-        // Initialize workflow data
         const workflowData: WorkflowData = {
           steps: [],
           status: "running",
         };
 
-        // Update user message with workflow data
         const userMessageWithWorkflow: Message = {
           ...userMessage,
           workflowData,
         };
 
-        // Update chat with workflow data
         const chatWithWorkflow: Chat = {
           ...chatWithUserMessage,
           messages: [
@@ -187,10 +181,8 @@ export default function ChatPage() {
         };
 
         setCurrentChat(chatWithWorkflow);
-        // Get streaming response
         const messages = chatWithWorkflow.messages;
 
-        // Assistant message state
         let assistantMessage: Message = {
           role: "assistant",
           content: "",
@@ -198,7 +190,6 @@ export default function ChatPage() {
           workflowData: { ...workflowData },
         };
 
-        // Add initial assistant message to the chat for streaming updates
         let currentChatState = {
           ...chatWithWorkflow,
           messages: [...chatWithWorkflow.messages, assistantMessage],
@@ -556,7 +547,6 @@ export default function ChatPage() {
     [input, sendMessage]
   );
 
-  // Handle input keydown
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
@@ -567,7 +557,6 @@ export default function ChatPage() {
     [handleSubmit]
   );
 
-  // Show loading state while initializing
   if (!isInitialized) {
     return (
       <div className="flex h-screen bg-background items-center justify-center">
@@ -578,16 +567,19 @@ export default function ChatPage() {
       </div>
     );
   }
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-950">
-      {/* Main Chat Area - Full Width */}
+      <AuthModal
+        isOpen={authModal.isOpen}
+        onClose={() => setAuthModal({ ...authModal, isOpen: false })}
+        mode={authModal.mode}
+        onModeChange={(mode) => setAuthModal({ ...authModal, mode })}
+      />
       <div className="flex-1 flex flex-col">
-        {/* Enhanced Chat Header with Clear Button */}
         <div className="border-b bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 p-4 shadow-lg border-slate-200/60">
           <div className="flex items-center justify-between max-w-4xl mx-auto">
-            {/* Left side - Clear button and Chat info */}
             <div className="flex items-center gap-4">
-              {/* Clear Chat Button */}
               <Button
                 variant="outline"
                 size="sm"
@@ -631,9 +623,7 @@ export default function ChatPage() {
               </div>
             </div>
 
-            {/* Right side - Status indicators */}
             <div className="flex items-center gap-3">
-              {" "}
               {isTyping && (
                 <div className="flex items-center gap-3 text-sm text-blue-600 bg-blue-50 dark:bg-blue-950/30 px-4 py-2 rounded-full border border-blue-200 shadow-sm">
                   <div className="flex gap-1">
@@ -648,8 +638,7 @@ export default function ChatPage() {
               <LlmStatusIndicator status={backendHealth} />
             </div>
           </div>
-        </div>{" "}
-        {/* Messages Area */}
+        </div>
         <ScrollArea className="flex-1 p-6 bg-gradient-to-b from-transparent to-slate-50/30">
           <div className="space-y-6 max-w-4xl mx-auto">
             {!currentChat?.messages || currentChat.messages.length === 0 ? (
@@ -666,12 +655,9 @@ export default function ChatPage() {
                 />
               ))
             )}
-
-            {/* Auto-scroll target */}
             <div ref={messagesEndRef} />
           </div>
-        </ScrollArea>{" "}
-        {/* Enhanced Input Area */}
+        </ScrollArea>
         <div className="border-t p-6 bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 border-slate-200/60 shadow-lg">
           <div className="max-w-4xl mx-auto">
             <EnhancedInput
@@ -683,7 +669,6 @@ export default function ChatPage() {
               isLoading={isLoading}
               placeholder="Type your message to Stellar AI..."
             />
-
             {error && (
               <div className="mt-3 flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />

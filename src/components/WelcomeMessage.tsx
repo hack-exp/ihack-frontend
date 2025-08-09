@@ -95,19 +95,11 @@ export function WelcomeMessage() {
         <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           Welcome to Stellar AI
         </h1>
-        <p className="text-muted-foreground text-lg mb-4">
-          Your intelligent assistant with 15+ integrated tools for productivity
-          and automation
-        </p>
 
         <div className="flex items-center justify-center gap-2 mb-6">
           <Badge variant="outline" className="text-xs">
             <Sparkles className="w-3 h-3 mr-1" />
             Real-time Workflow Visualization
-          </Badge>
-          <Badge variant="outline" className="text-xs">
-            <Calendar className="w-3 h-3 mr-1" />
-            Google Integration
           </Badge>
           <Badge variant="outline" className="text-xs">
             <Workflow className="w-3 h-3 mr-1" />

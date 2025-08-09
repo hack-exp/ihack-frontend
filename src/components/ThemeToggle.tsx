@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
-import { Button } from './ui/button';
-import { Sun, Moon, Monitor } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
+import { Button } from "./ui/button";
+import { Sun, Moon, Monitor } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
@@ -16,9 +16,10 @@ export default function ThemeToggle() {
 
   const handleThemeChange = () => {
     setIsAnimating(true);
-    const nextTheme = theme === 'dark' ? 'light' : theme === 'light' ? 'system' : 'dark';
+    const nextTheme =
+      theme === "dark" ? "light" : theme === "light" ? "system" : "dark";
     setTheme(nextTheme);
-    
+
     setTimeout(() => setIsAnimating(false), 300);
   };
 
@@ -28,11 +29,11 @@ export default function ThemeToggle() {
 
   const getIcon = () => {
     switch (theme) {
-      case 'dark':
+      case "dark":
         return <Moon className="h-4 w-4" />;
-      case 'light':
+      case "light":
         return <Sun className="h-4 w-4" />;
-      case 'system':
+      case "system":
         return <Monitor className="h-4 w-4" />;
       default:
         return <Sun className="h-4 w-4" />;
@@ -41,14 +42,14 @@ export default function ThemeToggle() {
 
   const getLabel = () => {
     switch (theme) {
-      case 'dark':
-        return 'Dark mode';
-      case 'light':
-        return 'Light mode';
-      case 'system':
-        return 'System theme';
+      case "dark":
+        return "Dark mode";
+      case "light":
+        return "Light mode";
+      case "system":
+        return "System theme";
       default:
-        return 'Toggle theme';
+        return "Toggle theme";
     }
   };
 
@@ -64,10 +65,12 @@ export default function ThemeToggle() {
         isAnimating && "scale-95"
       )}
     >
-      <div className={cn(
-        "transition-transform duration-300",
-        isAnimating && "rotate-180"
-      )}>
+      <div
+        className={cn(
+          "transition-transform duration-300",
+          isAnimating && "rotate-180"
+        )}
+      >
         {getIcon()}
       </div>
     </Button>

@@ -49,3 +49,5 @@ Thumbs.db
 
 # Test outputs
 /coverage
+# clerk configuration (can include secrets)
+/.clerk/
